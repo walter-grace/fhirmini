@@ -1,0 +1,7 @@
+.env
+*.pem
+*.json.cred
+.cloudflared/
+backups/
+*.log
+.DS_Store

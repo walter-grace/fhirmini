@@ -1,0 +1,56 @@
+services:
+  hapi-fhir:
+    image: hapiproject/hapi:v8.4.0
+    container_name: hapi-fhir
+    restart: on-failure
+    # Bind to loopback ONLY. The Cloudflare tunnel is the sole external path.
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://hapi-postgres:5432/${POSTGRES_DB}"
+      SPRING_DATASOURCE_USERNAME: "${POSTGRES_USER}"
+      SPRING_DATASOURCE_PASSWORD: "${POSTGRES_PASSWORD}"
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgresDialect"
+      # FHIR behavior
+      HAPI_FHIR_FHIR_VERSION: "R4"
+      HAPI_FHIR_ALLOW_MULTIPLE_DELETE: "true"
+      HAPI_FHIR_REUSE_CACHED_SEARCH_RESULTS_MILLIS: "-1"
+      # expose health + prometheus for monitoring
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,prometheus,info"
+    depends_on:
+      hapi-postgres:
+        condition: service_healthy
+    networks:
+      - fhir-internal
+
+  hapi-postgres:
+    image: postgres:16-alpine
+    container_name: hapi-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    # NOTE: no host port published. DB is reachable only on the internal docker network.
+    # For dev inspection, uncomment the next two lines (binds to loopback only):
+    # ports:
+    #   - "127.0.0.1:5432:5432"
+    volumes:
+      - hapi-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - fhir-internal
+
+networks:
+  fhir-internal:
+    driver: bridge
+
+volumes:
+  hapi-pgdata:
+    driver: local
