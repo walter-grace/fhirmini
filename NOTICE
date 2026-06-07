@@ -1,0 +1,18 @@
+fhirmini
+Copyright 2026 fhirmini contributors
+
+This product includes software developed as part of the fhirmini project,
+licensed under the Apache License, Version 2.0.
+
+------------------------------------------------------------------------------
+Third-party components (not bundled; fetched/used at build or run time):
+
+- HAPI FHIR JPA Server (https://github.com/hapifhir/hapi-fhir-jpaserver-starter)
+  Licensed under the Apache License 2.0. Built from source into a runnable WAR;
+  not redistributed in this repository.
+- PostgreSQL (https://www.postgresql.org/) — PostgreSQL License.
+- MLX, mlx-lm, mlx-vlm, mlx-embeddings (https://github.com/ml-explore) — MIT.
+- FastAPI, Uvicorn, psycopg, boto3, python-hl7, PyYAML, NumPy — see each project's license.
+
+Model weights (e.g. BAAI/bge-small-en-v1.5, Qwen2.5-VL) are downloaded from their
+respective sources at runtime and are subject to their own licenses.

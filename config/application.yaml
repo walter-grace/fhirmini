@@ -1,0 +1,70 @@
+# Native HAPI FHIR overrides for the Mac mini build.
+# Merged on top of the war's bundled application.yaml via:
+#   --spring.config.additional-location=file:.../config/application.yaml
+# Secrets are NOT stored here — DB_PASSWORD is injected from .env by scripts/run-hapi.sh.
+
+server:
+  # HARD RULE: bind loopback only. The Cloudflare tunnel is the sole external path.
+  address: 127.0.0.1
+  port: 8080
+  tomcat:
+    relaxed-query-chars: "|"
+    threads:
+      max: 100
+      min-spare: 10
+    # Per-request audit trail (supports compliance: who/what/when/status/latency).
+    accesslog:
+      enabled: true
+      directory: logs          # relative to the launcher's working dir (project root)
+      prefix: hapi-access
+      suffix: .log
+      file-date-format: .yyyy-MM-dd
+      pattern: "%t %a %m %U%q %s %b %Dms"
+      buffered: false      # flush each request immediately (audit trail)
+      rotate: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,prometheus,metrics"
+
+spring:
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/hapi
+    username: hapi_admin
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 16      # ~ perf cores * 4; OLTP-friendly on the M4
+      minimum-idle: 4
+      connection-timeout: 20000
+      max-lifetime: 1800000
+  jpa:
+    properties:
+      hibernate:
+        dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgresDialect
+        # write-throughput batching
+        order_inserts: true
+        order_updates: true
+        jdbc:
+          batch_size: 50
+          batch_versioned_data: true
+
+hapi:
+  fhir:
+    fhir_version: R4
+    # reuse identical search results for 60s — big win for repeated reads
+    reuse_cached_search_results_millis: 60000
+    allow_multiple_delete: true
+    # Integration-engine semantics: messages/partial loads can reference resources that
+    # haven't arrived yet (Observation before its Patient/Encounter). Don't reject those.
+    enforce_referential_integrity_on_write: false
+    enforce_referential_integrity_on_delete: false
+    # keep the built-in web tester pointed at the local base
+    tester:
+      home:
+        name: Mac FHIR (local)
+        server_address: 'http://localhost:8080/fhir'
+        refuse_to_fetch_third_party_urls: false
+        fhir_version: R4

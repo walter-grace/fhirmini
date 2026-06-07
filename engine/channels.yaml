@@ -1,0 +1,78 @@
+# Integration-engine channels.  A channel = source -> transform -> destination(s).
+# Every message is persisted to engine.messages (Postgres) for durability/replay/audit.
+#
+# source.type:  mllp | tcp | http | s3
+# source.codec: mllp (default) | raw-newline | raw-lenprefix   (TCP only)
+# transform.type: hl7v2-to-fhir | none   (+ optional ai_fallback: true)
+# destination.type: fhir | http | s3 | file | mllp
+#   destination.send: "raw" (default) | "transformed"  (ship the FHIR JSON instead of bytes)
+
+channels:
+  # --- HL7 v2 over MLLP, the hospital-standard inbound path ---
+  - name: hl7-mllp-in
+    enabled: true
+    source:
+      type: mllp
+      host: 127.0.0.1
+      port: 2575
+      codec: mllp
+    transform:
+      type: hl7v2-to-fhir
+      ai_fallback: false          # set true to let the MLX layer map messages the rules miss
+    destinations:
+      - name: persist-to-fhir     # parsed HL7 -> FHIR transaction -> our native HAPI
+        type: fhir
+        send: transformed
+      - name: archive-raw         # keep the original HL7 (S3-shaped, but local/no-creds)
+        type: file
+        dir: ./engine-out/archive
+        send: raw
+      # --- examples for the other destinations (uncomment + fill in) ---
+      # - name: s3-archive
+      #   type: s3
+      #   bucket: my-bucket
+      #   key_template: "hl7/{channel}/{control_id}.hl7"
+      #   endpoint_url: https://<accountid>.r2.cloudflarestorage.com   # R2/MinIO; omit for AWS
+      #   region: auto
+      #   send: raw
+      # - name: downstream-ehr
+      #   type: mllp
+      #   host: 10.0.0.20
+      #   port: 6661
+      #   send: raw
+      # - name: webhook
+      #   type: http
+      #   url: https://example.com/ingest
+      #   headers: { Authorization: "Bearer XXX" }
+      #   send: transformed
+
+  # --- Generic HTTP inbound (POST a message body to /engine/in/http-in) ---
+  - name: http-in
+    enabled: true
+    source:
+      type: http
+    transform:
+      type: none
+    destinations:
+      - name: dump
+        type: file
+        dir: ./engine-out/http
+        send: raw
+
+  # --- S3 inbound poller (disabled until you add a bucket + creds) ---
+  - name: s3-dropbox
+    enabled: false
+    source:
+      type: s3
+      bucket: my-inbound-bucket
+      prefix: incoming/
+      endpoint_url: ""            # set for R2/MinIO; leave blank for AWS
+      region: auto
+      poll_seconds: 30
+      delete_after: false
+    transform:
+      type: hl7v2-to-fhir
+    destinations:
+      - name: persist-to-fhir
+        type: fhir
+        send: transformed

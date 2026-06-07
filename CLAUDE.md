@@ -6,11 +6,16 @@ This file gives you (Claude Code) persistent context for this project. Read it b
 A self-hosted FHIR server running on a Mac Mini (Apple Silicon), exposed to the internet
 through a Cloudflare Tunnel with Zero Trust authentication. No inbound firewall ports are opened.
 
-Stack:
-- **HAPI FHIR JPA Server** (image `hapiproject/hapi`) — the FHIR R4 REST API
-- **PostgreSQL 16** — persistent datastore
-- **Docker Desktop for Mac** — runs both containers (linux/arm64)
-- **cloudflared** — outbound-only tunnel + Cloudflare Access in front
+Stack (NATIVE on-metal — no Docker; see docs/DECISIONS.md 2026-06-06):
+- **HAPI FHIR JPA Server 8.10.0** — built from `hapi-fhir-jpaserver-starter`, run as a
+  native Spring Boot war (`scripts/run-hapi.sh`) on **Temurin/openjdk@21** with generational ZGC.
+- **PostgreSQL 16** — native Homebrew `postgresql@16`, tuned via `$PGDATA/conf.d/10-m4-fhir.conf`.
+- **MLX AI layer** (planned) — on-device LLM + embeddings over FHIR; OpenRouter as a
+  dev/synthetic-only cloud fallback. PHI-safe by default.
+- **cloudflared** — outbound-only tunnel + Cloudflare Access in front.
+- `docker-compose.yml` is retained as a portable fallback, NOT the primary runtime.
+
+Run/stop: `./scripts/run-hapi.sh` (foreground) or via the launchd agent in `launchd/`.
 
 ## Current phase
 PHASE: dev-sandbox  (synthetic / test data ONLY — NO real patient data)

@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Unified control for the fhirmini appliance (native HAPI FHIR + integration engine + MLX AI).
+#   fhirmini status | start | stop | restart | install | uninstall
+#   fhirmini llm start|stop        (the on-demand MLX LLM server, ~4.3GB)
+#   fhirmini logs <hapi|ai|engine|llm|backup>
+#   fhirmini smoke                 (end-to-end test)
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+LA="$HOME/Library/LaunchAgents"
+SERVICES=(hapi ai engine backup)
+LEGACY=(com.macfhir.hapi com.macfhir.ai com.macfhir.engine com.macfhir.backup)
+
+_code() { curl -s -o /dev/null -w '%{http_code}' "$1" 2>/dev/null || echo 000; }
+_up()   { [ "$(_code "$1")" = "200" ] && echo "UP" || echo "down"; }
+
+cmd_install() {
+  mkdir -p "$LA" "$ROOT/logs"
+  # migrate: drop any legacy com.macfhir.* agents first (avoids port conflicts)
+  for l in "${LEGACY[@]}"; do launchctl unload "$LA/$l.plist" 2>/dev/null || true; rm -f "$LA/$l.plist"; done
+  for s in "${SERVICES[@]}"; do
+    label="com.fhirmini.$s"
+    sed "s|__ROOT__|$ROOT|g" "launchd/$label.plist" > "$LA/$label.plist"
+    launchctl unload "$LA/$label.plist" 2>/dev/null || true
+    launchctl load "$LA/$label.plist"
+    echo "loaded $label"
+  done
+}
+cmd_uninstall() {
+  for s in "${SERVICES[@]}"; do
+    launchctl unload "$LA/com.fhirmini.$s.plist" 2>/dev/null || true
+    rm -f "$LA/com.fhirmini.$s.plist"; echo "removed com.fhirmini.$s"
+  done
+  cmd_llm_stop || true
+}
+cmd_start()   { cmd_install; }
+cmd_stop()    {
+  for s in "${SERVICES[@]}"; do launchctl unload "$LA/com.fhirmini.$s.plist" 2>/dev/null || true; done
+  pkill -f "uvicorn app:app" 2>/dev/null || true
+  pkill -f "uvicorn engine.server:app" 2>/dev/null || true
+  cmd_llm_stop || true; echo "stopped"
+}
+cmd_restart() { cmd_stop; sleep 2; cmd_start; }
+
+cmd_llm_start() {
+  [ "$(_code http://127.0.0.1:8081/v1/models)" = "200" ] && { echo "llm already up"; return; }
+  mkdir -p "$ROOT/.build"
+  nohup ./scripts/run-ai-llm.sh > logs/ai-llm.out 2> logs/ai-llm.err < /dev/null &
+  echo $! > .build/ai-llm.pid; echo "llm starting (pid $!) — loads ~4.3GB"
+}
+cmd_llm_stop() { [ -f .build/ai-llm.pid ] && kill "$(cat .build/ai-llm.pid)" 2>/dev/null && echo "llm stopped" || true; }
+
+cmd_status() {
+  echo "SERVICE             PORT   STATE"
+  printf "Postgres            5432   %s\n" "$(pg_isready -q && echo UP || echo down)"
+  printf "HAPI FHIR           8080   %s\n" "$(_up http://127.0.0.1:8080/fhir/metadata)"
+  printf "AI sidecar          8090   %s\n" "$(_up http://127.0.0.1:8090/ai/health)"
+  printf "MLX LLM (on-demand) 8081   %s\n" "$(_up http://127.0.0.1:8081/v1/models)"
+  printf "Engine API          8088   %s\n" "$(_up http://127.0.0.1:8088/engine/health)"
+  printf "MLLP listener       2575   %s\n" "$(nc -z 127.0.0.1 2575 2>/dev/null && echo open || echo closed)"
+  echo ""; echo "launchd agents:"; launchctl list | grep fhirmini || echo "  (none — run: fhirmini install)"
+  echo ""; psql -d "${POSTGRES_DB:-hapi}" -tAc "select '  FHIR resources: '||count(*) from hfj_resource" 2>/dev/null || true
+}
+cmd_logs()  { tail -n 40 -f "logs/${1:-engine}.err" "logs/${1:-engine}.out" 2>/dev/null; }
+cmd_smoke() { ./scripts/smoke-test.sh; }
+
+case "${1:-status}" in
+  status|install|uninstall|start|stop|restart|smoke) "cmd_${1:-status}" ;;
+  llm)  case "${2:-}" in start) cmd_llm_start ;; stop) cmd_llm_stop ;; *) echo "usage: fhirmini llm start|stop" ;; esac ;;
+  logs) cmd_logs "${2:-engine}" ;;
+  *) echo "usage: fhirmini {status|start|stop|restart|install|uninstall|llm start|llm stop|logs <svc>|smoke}" ;;
+esac

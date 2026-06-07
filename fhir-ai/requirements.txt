@@ -1,0 +1,23 @@
+# Python dependencies for the fhirmini AI sidecar + integration engine.
+# Apple-Silicon (MLX) is required for the local AI backend. The bootstrap script
+# creates the venv with --system-site-packages so already-installed MLX/torch are reused.
+# Versions below are the ones this project was validated against (2026-06).
+
+# --- web / serving ---
+fastapi==0.135.2
+uvicorn==0.42.0
+
+# --- data / db ---
+numpy>=1.26
+psycopg[binary]==3.3.4
+PyYAML>=6.0
+
+# --- healthcare / cloud connectors ---
+hl7==0.4.5
+boto3>=1.40
+
+# --- on-device AI (Apple Silicon / MLX) ---
+mlx==0.31.1
+mlx-lm==0.31.1
+mlx-vlm==0.4.2
+mlx-embeddings>=0.0.3

@@ -1,7 +1,31 @@
+# --- secrets / local config (NEVER commit) ---
 .env
 *.pem
 *.json.cred
 .cloudflared/
+
+# --- build / vendored artifacts ---
+.build/
+target/
+*.war
+
+# --- python ---
+fhir-ai/.venv/
+**/__pycache__/
+*.pyc
+
+# --- runtime state & data (synthetic, but not for version control) ---
+logs/
 backups/
-*.log
+engine-out/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# --- os / editor ---
 .DS_Store
+*.log
+*.swp
+.idea/
+.vscode/
