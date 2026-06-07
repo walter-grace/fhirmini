@@ -22,6 +22,13 @@ exec > >(tee "$OUT/setup.log") 2>&1
 # observability first: serve $OUT immediately so progress is visible via the proxy
 (cd "$OUT" && nohup python3 -m http.server 8000 >/dev/null 2>&1 &)
 
+# CRITICAL: on ANY failure, keep the pod alive serving its own post-mortem instead of
+# exiting (an exiting container restart-loops and destroys the evidence).
+trap 'code=$?; echo "FAILED line $LINENO (exit $code)" | tee "$OUT/FAILED"; sleep infinity' ERR
+
+# idempotency: a restarted container must not trip over a previous attempt
+rm -rf /workspace/hapi
+
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y curl git gnupg lsb-release maven sudo procps
