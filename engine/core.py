@@ -17,10 +17,34 @@ def _conninfo():
             f"password={os.environ.get('POSTGRES_PASSWORD','')}")
 
 
+SCHEMA_SQL = """
+CREATE SCHEMA IF NOT EXISTS engine;
+CREATE TABLE IF NOT EXISTS engine.messages (
+  id BIGSERIAL PRIMARY KEY, channel TEXT NOT NULL, direction TEXT NOT NULL DEFAULT 'inbound',
+  source TEXT, codec TEXT, msg_type TEXT, control_id TEXT,
+  status TEXT NOT NULL DEFAULT 'received', attempts INT NOT NULL DEFAULT 0,
+  raw BYTEA, transformed JSONB, error TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE INDEX IF NOT EXISTS messages_status_idx  ON engine.messages(status, attempts);
+CREATE INDEX IF NOT EXISTS messages_channel_idx ON engine.messages(channel, created_at DESC);
+CREATE TABLE IF NOT EXISTS engine.deliveries (
+  id BIGSERIAL PRIMARY KEY,
+  message_id BIGINT NOT NULL REFERENCES engine.messages(id) ON DELETE CASCADE,
+  destination TEXT NOT NULL, status TEXT NOT NULL, detail TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now());
+"""
+
+
 def _db():
     global _conn
     if _conn is None or _conn.closed:
         _conn = psycopg.connect(_conninfo(), autocommit=True)
+        # auto-provision the ledger schema (owned by the connecting role — avoids the
+        # superuser-created-tables permission trap; see docs/DECISIONS.md)
+        try:
+            _conn.execute(SCHEMA_SQL)
+        except psycopg.errors.InsufficientPrivilege:
+            pass  # schema already exists with proper grants
     return _conn
 
 

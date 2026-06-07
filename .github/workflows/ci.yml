@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Syntax-check all Python (incl. MLX modules, without importing)
+        run: |
+          python -m py_compile $(git ls-files '*.py')
+
+      - name: Install engine test deps (no MLX needed)
+        run: pip install hl7==0.4.5 pytest
+
+      - name: Run engine unit tests (codecs + HL7v2->FHIR)
+        run: pytest -q tests/
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: ./scripts
+          severity: warning
