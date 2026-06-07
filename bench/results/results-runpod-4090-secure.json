@@ -1,0 +1,159 @@
+{
+  "label": "runpod-4090-secure",
+  "base": "http://127.0.0.1:8080/fhir",
+  "started": "2026-06-07 23:13:14",
+  "cost_per_hour": 0.69,
+  "runs": [
+    {
+      "scenario": "metadata",
+      "concurrency": 1,
+      "requests": 245,
+      "rps": 35.0,
+      "errors": 0,
+      "p50_ms": 27.15,
+      "p95_ms": 37.87,
+      "p99_ms": 41.87
+    },
+    {
+      "scenario": "metadata",
+      "concurrency": 8,
+      "requests": 1499,
+      "rps": 213.2,
+      "errors": 0,
+      "p50_ms": 33.59,
+      "p95_ms": 66.69,
+      "p99_ms": 92.95
+    },
+    {
+      "scenario": "metadata",
+      "concurrency": 32,
+      "requests": 1270,
+      "rps": 177.5,
+      "errors": 0,
+      "p50_ms": 135.51,
+      "p95_ms": 409.9,
+      "p99_ms": 585.95
+    },
+    {
+      "scenario": "patient_read",
+      "concurrency": 1,
+      "requests": 3371,
+      "rps": 481.4,
+      "errors": 0,
+      "p50_ms": 1.81,
+      "p95_ms": 3.48,
+      "p99_ms": 5.42
+    },
+    {
+      "scenario": "patient_read",
+      "concurrency": 8,
+      "requests": 14281,
+      "rps": 2038.3,
+      "errors": 0,
+      "p50_ms": 3.53,
+      "p95_ms": 6.86,
+      "p99_ms": 9.72
+    },
+    {
+      "scenario": "patient_read",
+      "concurrency": 32,
+      "requests": 15088,
+      "rps": 2149.6,
+      "errors": 0,
+      "p50_ms": 12.27,
+      "p95_ms": 32.95,
+      "p99_ms": 47.6
+    },
+    {
+      "scenario": "name_search",
+      "concurrency": 1,
+      "requests": 1143,
+      "rps": 163.2,
+      "errors": 0,
+      "p50_ms": 4.39,
+      "p95_ms": 16.98,
+      "p99_ms": 27.02
+    },
+    {
+      "scenario": "name_search",
+      "concurrency": 8,
+      "requests": 11564,
+      "rps": 1650.8,
+      "errors": 0,
+      "p50_ms": 4.3,
+      "p95_ms": 10.9,
+      "p99_ms": 16.35
+    },
+    {
+      "scenario": "name_search",
+      "concurrency": 32,
+      "requests": 11608,
+      "rps": 1653.8,
+      "errors": 0,
+      "p50_ms": 16.16,
+      "p95_ms": 42.58,
+      "p99_ms": 60.74
+    },
+    {
+      "scenario": "obs_search",
+      "concurrency": 1,
+      "requests": 4720,
+      "rps": 674.2,
+      "errors": 0,
+      "p50_ms": 1.36,
+      "p95_ms": 2.66,
+      "p99_ms": 4.02
+    },
+    {
+      "scenario": "obs_search",
+      "concurrency": 8,
+      "requests": 22574,
+      "rps": 3222.7,
+      "errors": 0,
+      "p50_ms": 2.28,
+      "p95_ms": 4.06,
+      "p99_ms": 5.74
+    },
+    {
+      "scenario": "obs_search",
+      "concurrency": 32,
+      "requests": 21652,
+      "rps": 3086.5,
+      "errors": 0,
+      "p50_ms": 7.64,
+      "p95_ms": 25.4,
+      "p99_ms": 39.4
+    },
+    {
+      "scenario": "hl7_mllp_ingest",
+      "concurrency": 1,
+      "requests": 452,
+      "rps": 64.5,
+      "errors": 0,
+      "p50_ms": 13.65,
+      "p95_ms": 26.89,
+      "p99_ms": 46.4
+    },
+    {
+      "scenario": "hl7_mllp_ingest",
+      "concurrency": 8,
+      "requests": 2276,
+      "rps": 324.1,
+      "errors": 0,
+      "p50_ms": 21.81,
+      "p95_ms": 48.35,
+      "p99_ms": 64.65
+    },
+    {
+      "scenario": "hl7_mllp_ingest",
+      "concurrency": 32,
+      "requests": 2057,
+      "rps": 291.0,
+      "errors": 0,
+      "p50_ms": 103.78,
+      "p95_ms": 155.3,
+      "p99_ms": 182.51
+    }
+  ],
+  "reads_per_dollar": 11215304
+}

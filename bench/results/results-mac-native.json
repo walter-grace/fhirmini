@@ -1,0 +1,159 @@
+{
+  "label": "mac-mini-m4-native",
+  "base": "http://127.0.0.1:8080/fhir",
+  "started": "2026-06-07 09:33:45",
+  "cost_per_hour": 0.026,
+  "runs": [
+    {
+      "scenario": "metadata",
+      "concurrency": 1,
+      "requests": 796,
+      "rps": 113.6,
+      "errors": 0,
+      "p50_ms": 8.46,
+      "p95_ms": 10.96,
+      "p99_ms": 12.48
+    },
+    {
+      "scenario": "metadata",
+      "concurrency": 8,
+      "requests": 1709,
+      "rps": 243.3,
+      "errors": 0,
+      "p50_ms": 32.52,
+      "p95_ms": 36.55,
+      "p99_ms": 38.66
+    },
+    {
+      "scenario": "metadata",
+      "concurrency": 32,
+      "requests": 1759,
+      "rps": 248.6,
+      "errors": 0,
+      "p50_ms": 125.79,
+      "p95_ms": 183.47,
+      "p99_ms": 206.24
+    },
+    {
+      "scenario": "patient_read",
+      "concurrency": 1,
+      "requests": 14798,
+      "rps": 2113.9,
+      "errors": 0,
+      "p50_ms": 0.44,
+      "p95_ms": 0.7,
+      "p99_ms": 0.9
+    },
+    {
+      "scenario": "patient_read",
+      "concurrency": 8,
+      "requests": 62285,
+      "rps": 8896.4,
+      "errors": 0,
+      "p50_ms": 0.76,
+      "p95_ms": 1.52,
+      "p99_ms": 1.76
+    },
+    {
+      "scenario": "patient_read",
+      "concurrency": 32,
+      "requests": 73319,
+      "rps": 10469.7,
+      "errors": 0,
+      "p50_ms": 1.89,
+      "p95_ms": 5.13,
+      "p99_ms": 29.61
+    },
+    {
+      "scenario": "name_search",
+      "concurrency": 1,
+      "requests": 4068,
+      "rps": 581.1,
+      "errors": 0,
+      "p50_ms": 1.62,
+      "p95_ms": 3.39,
+      "p99_ms": 6.51
+    },
+    {
+      "scenario": "name_search",
+      "concurrency": 8,
+      "requests": 19688,
+      "rps": 2811.1,
+      "errors": 0,
+      "p50_ms": 2.66,
+      "p95_ms": 6.08,
+      "p99_ms": 8.59
+    },
+    {
+      "scenario": "name_search",
+      "concurrency": 32,
+      "requests": 20828,
+      "rps": 2969.2,
+      "errors": 0,
+      "p50_ms": 6.03,
+      "p95_ms": 35.53,
+      "p99_ms": 118.94
+    },
+    {
+      "scenario": "obs_search",
+      "concurrency": 1,
+      "requests": 4910,
+      "rps": 701.0,
+      "errors": 0,
+      "p50_ms": 1.42,
+      "p95_ms": 1.78,
+      "p99_ms": 1.96
+    },
+    {
+      "scenario": "obs_search",
+      "concurrency": 8,
+      "requests": 34231,
+      "rps": 4889.2,
+      "errors": 0,
+      "p50_ms": 1.59,
+      "p95_ms": 2.03,
+      "p99_ms": 2.69
+    },
+    {
+      "scenario": "obs_search",
+      "concurrency": 32,
+      "requests": 37433,
+      "rps": 5344.3,
+      "errors": 0,
+      "p50_ms": 3.87,
+      "p95_ms": 16.44,
+      "p99_ms": 41.62
+    },
+    {
+      "scenario": "hl7_mllp_ingest",
+      "concurrency": 1,
+      "requests": 945,
+      "rps": 134.8,
+      "errors": 0,
+      "p50_ms": 6.54,
+      "p95_ms": 12.76,
+      "p99_ms": 14.29
+    },
+    {
+      "scenario": "hl7_mllp_ingest",
+      "concurrency": 8,
+      "requests": 7586,
+      "rps": 1083.2,
+      "errors": 0,
+      "p50_ms": 7.15,
+      "p95_ms": 9.98,
+      "p99_ms": 13.09
+    },
+    {
+      "scenario": "hl7_mllp_ingest",
+      "concurrency": 32,
+      "requests": 7864,
+      "rps": 1119.6,
+      "errors": 0,
+      "p50_ms": 27.87,
+      "p95_ms": 34.71,
+      "p99_ms": 43.16
+    }
+  ],
+  "reads_per_dollar": 1449650769
+}

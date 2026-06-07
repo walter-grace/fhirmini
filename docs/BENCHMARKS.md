@@ -39,11 +39,43 @@ infrastructure (RunPod) running the identical stack.
 - JVM: openjdk 21, generational ZGC, 2GB heap. Postgres 16 native, tuned
   (see `docs/DECISIONS.md`). Stack shares the box with other production workloads.
 
-### RunPod (same stack via docker-compose) — TBD
+### RunPod Secure RTX 4090 — measured 2026-06-07
 
-| Scenario | Concurrency | req/s | p50 | p95 | p99 | $/hr | reads per $1 |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| _pending_ | | | | | | | |
+Host: AMD EPYC 75F3 (pod = the vCPU slice sold with a 1×4090 secure pod) + RTX 4090,
+$0.69/hr. Identical stack built from the same HAPI git SHA on Temurin 21 + Postgres 16,
+same tuning, same dataset, same harness, loopback. Raw data: [`bench/results/`](../bench/results/).
+
+| Scenario | Concurrency | req/s | p50 | p95 | p99 | errors |
+|---|---:|---:|---:|---:|---:|---:|
+| Patient read | 1 | 481 | 1.81 ms | 3.48 ms | 5.42 ms | 0 |
+| Patient read | 8 | 2,038 | 3.53 ms | 6.86 ms | 9.72 ms | 0 |
+| **Patient read** | **32** | **2,150** | **12.3 ms** | 33.0 ms | 47.6 ms | 0 |
+| Name search | 32 | 1,654 | 16.2 ms | 42.6 ms | 60.7 ms | 0 |
+| Observation search | 32 | 3,087 | 7.6 ms | 25.4 ms | 39.4 ms | 0 |
+| HL7v2 MLLP ingest | 8 | 324 msg/s | 21.8 ms | 48.4 ms | 64.7 ms | 0 |
+| **HL7v2 MLLP ingest** | **32** | **291 msg/s** | 103.8 ms | 155.3 ms | 182.5 ms | 0 |
+
+- **Reads per $1**: ~**11.2 million** (peak patient_read at $0.69/hr).
+
+### Head-to-head
+
+| Metric | Mac mini M4 ($599, 16GB) | RunPod 4090 Secure ($0.69/hr) | Mac advantage |
+|---|---:|---:|---:|
+| Patient read, peak req/s | **10,470** | 2,150 | **4.9×** |
+| Patient read p50 (conc 1) | **0.44 ms** | 1.81 ms | **4.1×** |
+| Observation search, peak req/s | **5,344** | 3,087 | 1.7× |
+| HL7v2 ingest, peak msg/s | **1,120** | 324 | **3.5×** |
+| **Reads per $1** | **~1.45 billion** | ~11.2 million | **~129×** |
+
+The Mac mini didn't just win on cost — it won on **raw throughput**, while the cloud
+GPU idled through every FHIR scenario (FHIR is CPU/DB-bound; you pay for silicon the
+workload can't use). And the Mac was simultaneously running unrelated production
+workloads during its runs.
+
+**Honest caveats:** the pod's container reports the host's 128 cores but is sold as a
+vCPU slice; the Mac's JVM was long-running (fully JIT-warmed) while the pod's was minutes
+old (both got per-scenario warmup); single-run numbers, not averaged across many hosts.
+The cost math survives all of these.
 
 ### Cloudflare Tunnel overhead (Mac, loopback vs tunnel URL) — TBD
 
