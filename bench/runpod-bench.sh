@@ -31,7 +31,14 @@ rm -rf /workspace/hapi
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -y curl git gnupg lsb-release maven sudo procps
+apt-get install -y curl git gnupg lsb-release sudo procps
+
+# Maven: apt on ubuntu 22.04 ships 3.6.3 but the HAPI starter enforces >=3.8.3 — use the tarball
+MVN_VER=3.9.9
+curl -fsSL "https://dlcdn.apache.org/maven/maven-3/${MVN_VER}/binaries/apache-maven-${MVN_VER}-bin.tar.gz" -o /tmp/maven.tgz \
+  || curl -fsSL "https://archive.apache.org/dist/maven/maven-3/${MVN_VER}/binaries/apache-maven-${MVN_VER}-bin.tar.gz" -o /tmp/maven.tgz
+tar xzf /tmp/maven.tgz -C /opt
+export PATH="/opt/apache-maven-${MVN_VER}/bin:$PATH"
 
 # --- Temurin 21 + PostgreSQL 16 (vendor repos work on 20.04/22.04/24.04) ---
 mkdir -p /etc/apt/keyrings
