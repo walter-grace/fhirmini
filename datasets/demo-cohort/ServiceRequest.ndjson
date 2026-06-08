@@ -1,2 +1,0 @@
-{"resourceType": "ServiceRequest", "id": "be30159f6ad2abc4", "meta": {}, "status": "active", "intent": "order", "code": {"coding": [{"code": "CBC", "display": "Complete Blood Count"}], "text": "Complete Blood Count"}, "subject": {"reference": "Patient/d21a2d93c21875f1"}}
-{"resourceType": "ServiceRequest", "id": "d97489240229d4cb", "meta": {}, "status": "active", "intent": "order", "code": {"coding": [{"code": "XR", "display": "Chest Xray"}], "text": "Chest Xray"}, "subject": {"reference": "Patient/23be371768958f29"}}

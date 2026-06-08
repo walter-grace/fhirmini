@@ -1,8 +1,0 @@
-{"resourceType": "Patient", "id": "b686578f1e9c1873", "meta": {}, "gender": "female", "birthDate": "1985"}
-{"resourceType": "Patient", "id": "a4b561f68beac5d2", "meta": {}, "gender": "male", "birthDate": "1972"}
-{"resourceType": "Patient", "id": "354299d3867a0131", "meta": {}, "gender": "other", "birthDate": "2001"}
-{"resourceType": "Patient", "id": "9ae055fd16bb42ff", "meta": {}, "identifier": [{"system": "urn:mac-fhir:mrn", "value": "c3bd6d3b3090dcc7"}], "gender": "female", "birthDate": "1991"}
-{"resourceType": "Patient", "id": "6feaac3a5ce40533", "meta": {}, "identifier": [{"system": "urn:mac-fhir:mrn", "value": "5bcd51ec2dd43433"}], "gender": "female", "birthDate": "1991"}
-{"resourceType": "Patient", "id": "d21a2d93c21875f1", "meta": {}, "identifier": [{"system": "urn:mac-fhir:mrn", "value": "81b79b8b7d006a44"}], "gender": "male", "birthDate": "1988"}
-{"resourceType": "Patient", "id": "23be371768958f29", "meta": {}, "identifier": [{"system": "urn:mac-fhir:mrn", "value": "8dad187e322d17b6"}], "gender": "female", "birthDate": "1990", "address": [{"state": "HW"}]}
-{"resourceType": "Patient", "id": "c5931e69ad3ef647", "meta": {}, "text": {"status": "generated"}, "identifier": [{"system": "http://hospital.example.org/mrn", "value": "b80453c98d29274b"}], "gender": "male", "birthDate": "1974", "address": [{"state": "MA", "country": "US"}]}

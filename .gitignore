@@ -29,3 +29,6 @@ engine-out/
 *.swp
 .idea/
 .vscode/
+
+# generated data exports — never commit
+datasets/
