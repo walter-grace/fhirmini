@@ -61,6 +61,16 @@ hapi:
     # haven't arrived yet (Observation before its Patient/Encounter). Don't reject those.
     enforce_referential_integrity_on_write: false
     enforce_referential_integrity_on_delete: false
+    # Bulk Data Access (Flat FHIR) — required by ONC g(10) for population export
+    bulk_export_enabled: true
+    # Load the US Core IG so resources validate against US Core profiles (ONC g(10)).
+    # Downloads US Core + transitive deps from packages.fhir.org at startup (~tens of MB).
+    install_transitive_ig_dependencies: true
+    implementationguides:
+      us_core:
+        name: hl7.fhir.us.core
+        version: 6.1.0
+        installMode: STORE_AND_INSTALL
     # keep the built-in web tester pointed at the local base
     tester:
       home:

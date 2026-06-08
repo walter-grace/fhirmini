@@ -29,6 +29,13 @@ Removing it is the single biggest performance lever on a Mac mini. Measured on a
 (16 GB): FHIR reads **p50 ~2.8 ms**, **~1,400 req/s**. `docker-compose.yml` is kept only as a
 portable fallback. See `docs/DECISIONS.md`.
 
+## Conformance
+Standards-compliant **FHIR R4** server: the full base RESTful API (read/vread/update/patch/
+delete/create, history, search + `_include`/chaining, transaction/batch, versioning,
+conditional ops, `$validate`/`$expand`/`$everything`, JSON+XML+Turtle). Plus **US Core 6.1.0**
+profiles + validation and **Bulk Data `$export`**. Remaining for ONC g(10): SMART-on-FHIR auth
+(today: Cloudflare Access at the edge). Full verified breakdown: [`docs/CONFORMANCE.md`](docs/CONFORMANCE.md).
+
 ## Components & ports
 | Layer | Port | Run |
 |---|---|---|
