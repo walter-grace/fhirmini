@@ -2,7 +2,7 @@
 set -uo pipefail
 
 # End-to-end smoke test of the whole appliance. Exits non-zero on any failure.
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"; cd "$ROOT"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"; cd "$ROOT" || exit 1
 PASS=0; FAIL=0
 ok()   { echo "  ✅ $1"; PASS=$((PASS+1)); }
 bad()  { echo "  ❌ $1"; FAIL=$((FAIL+1)); }
@@ -41,4 +41,4 @@ chk "${T:-0}" "1" "HL7 patient landed in FHIR"
 
 echo "──────────────────────────────────────────────"
 echo "RESULT: $PASS passed, $FAIL failed"
-exit $([ "$FAIL" -eq 0 ] && echo 0 || echo 1)
+[ "$FAIL" -eq 0 ]; exit $?

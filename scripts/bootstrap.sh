@@ -22,7 +22,7 @@ brew list maven         >/dev/null 2>&1 || brew install maven
 brew list postgresql@16 >/dev/null 2>&1 || brew install postgresql@16
 brew services start postgresql@16 >/dev/null 2>&1 || true
 export JAVA_HOME="/opt/homebrew/opt/openjdk@21"
-for i in $(seq 1 30); do pg_isready -q && break; sleep 1; done
+for _ in $(seq 1 30); do pg_isready -q && break; sleep 1; done
 
 # --- 2. .env ---
 if [ ! -f .env ]; then
@@ -68,7 +68,7 @@ CONF
 grep -q "include_dir = 'conf.d'" "${PGDATA}/postgresql.conf" \
   || printf "\ninclude_dir = 'conf.d'\n" >> "${PGDATA}/postgresql.conf"
 brew services restart postgresql@16 >/dev/null 2>&1 || true
-for i in $(seq 1 30); do pg_isready -q && break; sleep 1; done
+for _ in $(seq 1 30); do pg_isready -q && break; sleep 1; done
 
 # --- 4. build HAPI FHIR war ---
 say "Building HAPI FHIR (this downloads a dependency tree on first run)"
