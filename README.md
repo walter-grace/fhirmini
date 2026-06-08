@@ -89,6 +89,18 @@ curl -XPOST :8090/ai/extract -d '{"text":"CKD stage 3"}'     # free text -> FHIR
 Backend is selected by `AI_BACKEND` in `.env`: `local` (MLX, PHI-safe) or `openrouter`
 (cloud — **dev/synthetic only**, hard-disabled at `PHASE=phi-readiness`).
 
+## Agent interface (MCP)
+fhirmini ships an **MCP server** (`scripts/run-mcp.sh`) that exposes all three layers as
+14 agent tools — so **any MCP client becomes the agent** that drives your stack: Claude
+Desktop/Code, or [picoclaw](https://github.com/sipeed/picoclaw) on a $10 RISC-V/ARM board.
+```bash
+scripts/run-mcp.sh                     # stdio (Claude Desktop/Code, local agent)
+scripts/run-mcp.sh --http --port 8200  # HTTP (remote/edge agent like picoclaw on a board)
+```
+*"Register patient Jane Doe (MRN 5512), log a heart rate of 88, is she at cardiac risk?"* →
+the agent calls `hl7_send_adt` → `fhir_create_observation` → `ai_ask`. Full setup +
+Claude/picoclaw wiring: [`docs/MCP.md`](docs/MCP.md).
+
 ## ⚠️ Before you ever put real patient data in this
 This is a strong **technical** foundation, but running real PHI is a legal/operational process,
 not a flag. At minimum: a **Cloudflare Enterprise BAA** (the free tunnel is NOT a PHI-eligible

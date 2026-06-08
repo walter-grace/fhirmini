@@ -16,6 +16,9 @@ PyYAML>=6.0
 hl7==0.4.5
 boto3>=1.40
 
+# --- MCP server (agent interface; see docs/MCP.md) ---
+mcp>=1.27
+
 # --- on-device AI (Apple Silicon / MLX) ---
 mlx==0.31.1
 mlx-lm==0.31.1
