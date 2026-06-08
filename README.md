@@ -101,6 +101,16 @@ python -m pipeline.export --name diabetes-2026 --condition 44054006 --consent ta
 Learners (RAG / LoRA fine-tune / predictive ML / RL) and FHIR write-back are the next phases.
 Details + the compliance caveat: [`docs/PIPELINE.md`](docs/PIPELINE.md).
 
+**Analysis (comparative effectiveness)** — *"which medicines work?"* as deterministic cohort
+comparison over the FHIR data (stats in code; the LLM only narrates). Built for dialysis
+(phosphate binders, ESAs, Kt/V, …), metric-agnostic:
+```bash
+python -m analysis.synth --n 30                              # synthetic dialysis cohort
+python -m analysis.dialysis --metric phosphorus --by binder  # % in target per binder, + caveats
+```
+Observational/association-only — a quality-improvement tool, not an Rx recommender. See
+[`docs/ANALYSIS.md`](docs/ANALYSIS.md).
+
 ## Agent interface (MCP)
 fhirmini ships an **MCP server** (`scripts/run-mcp.sh`) that exposes all three layers as
 14 agent tools — so **any MCP client becomes the agent** that drives your stack: Claude
