@@ -29,3 +29,6 @@ engine-out/
 *.swp
 .idea/
 .vscode/
+
+# governed training exports (de-identified, but not for VCS)
+datasets/

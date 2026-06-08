@@ -89,6 +89,18 @@ curl -XPOST :8090/ai/extract -d '{"text":"CKD stage 3"}'     # free text -> FHIR
 Backend is selected by `AI_BACKEND` in `.env`: `local` (MLX, PHI-safe) or `openrouter`
 (cloud — **dev/synthetic only**, hard-disabled at `PHASE=phi-readiness`).
 
+## Data pipeline — govern → learn → act
+fhirmini is also an **on-prem clinical-AI loop**: ingest data, learn from it on the box, push
+results back out — **PHI never leaves the machine.** Phase 1 (govern) ships now: turn the live
+repo into a de-identified, consent-filtered, audited training set every learner can use.
+```bash
+export DEID_SALT=...   # in .env
+python -m pipeline.export --name diabetes-2026 --condition 44054006 --consent tag
+# -> datasets/diabetes-2026/*.ndjson + manifest.json   (HIPAA Safe-Harbor-oriented de-id)
+```
+Learners (RAG / LoRA fine-tune / predictive ML / RL) and FHIR write-back are the next phases.
+Details + the compliance caveat: [`docs/PIPELINE.md`](docs/PIPELINE.md).
+
 ## Agent interface (MCP)
 fhirmini ships an **MCP server** (`scripts/run-mcp.sh`) that exposes all three layers as
 14 agent tools — so **any MCP client becomes the agent** that drives your stack: Claude
